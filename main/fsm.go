@@ -93,8 +93,6 @@ func (s *FSM) Apply(raftLog *raft.Log) interface{} {
 		return errors.New("Error while reading log")
 	}
 
-	log.Println(l)
-
 	switch l.Command {
   case barta.CreateMetaTopic:
     s.mutex.Lock()
@@ -189,7 +187,7 @@ func (s *FSM) Join(nodeID, addr string) error {
 	return nil
 }
 
-func (f *FSM) GetMessage(topicName string) (*barta.Message, error) {
+func (f *FSM) GetMessage(topicName string, consumerID string) (*barta.Message, error) {
 	topic, ok := f.topics[topicName]
 	if !ok {
 		return &barta.Message{}, errors.New(fmt.Sprintf("Topic %s does not exist\n", topicName))
@@ -197,7 +195,7 @@ func (f *FSM) GetMessage(topicName string) (*barta.Message, error) {
 
 	log.Printf("Getting message from topic %s", topicName)
 
-	return topic.GetMessage(f.meta)
+	return topic.GetMessage(f.meta, consumerID)
 }
 
 func (f *FSM) AddMessage(key, val, topicName string) error {

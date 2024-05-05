@@ -1,12 +1,15 @@
 package barta
 
 import (
+	"errors"
+	"fmt"
+	"log"
 	"sync"
 )
 
 type Partition struct {
-  mutex       sync.Mutex
-	PartitionId int
+	mutex       sync.Mutex
+	PartitionID int
 	Messages    []*Message
 	TopicName   string
 }
@@ -15,11 +18,12 @@ func (p *Partition) WriteMessage(message *Message) {
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
 	p.Messages = append(p.Messages, message)
+	log.Println(len(p.Messages))
 }
 
 func (p *Partition) ReadMessage(offset int) (*Message, error) {
 	if offset >= len(p.Messages) {
-		return &Message{}, PartitionExhaustedError{PartitionId: p.PartitionId}
+		return &Message{}, errors.New(fmt.Sprintf("Partition %d of topic %s exhausted", p.PartitionID, p.TopicName))
 	}
 
 	return p.Messages[offset], nil
@@ -27,7 +31,7 @@ func (p *Partition) ReadMessage(offset int) (*Message, error) {
 
 func NewPartition(id int, topicName string) *Partition {
 	return &Partition{
-		PartitionId: id,
+		PartitionID: id,
 		Messages:    []*Message{},
 		TopicName:   topicName,
 	}

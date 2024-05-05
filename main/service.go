@@ -32,9 +32,10 @@ func (s *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		s.fsm.AddTopic(t.TopicName, t.ReplicationFactor)
 	})
 
-	mux.HandleFunc("/message/get/{topicName}", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/message/get/{topicName}/{consumerID}", func(w http.ResponseWriter, r *http.Request) {
 		topicName := r.PathValue("topicName")
-		message, err := s.fsm.GetMessage(topicName)
+    consumerID := r.PathValue("consumerID")
+		message, err := s.fsm.GetMessage(topicName, consumerID)
 		if err != nil {
 			w.WriteHeader(500)
 			w.Write([]byte(err.Error()))

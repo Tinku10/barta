@@ -35,13 +35,13 @@ func (t *Topic) PutMessage(meta *MetaTopic, m *Message) {
 	t.Partitions[0].WriteMessage(m)
 }
 
-func (t *Topic) GetMessage(meta *MetaTopic) (*Message, error) {
-  offset := meta.GetClientOffset("1", t.TopicID, 0)
+func (t *Topic) GetMessage(meta *MetaTopic, consumerID string) (*Message, error) {
+  offset := meta.GetClientOffset(consumerID, t.TopicID, 0)
   message, err := t.Partitions[0].ReadMessage(offset)
   if err != nil {
     return &Message{}, err
   }
-  meta.CommitClientOffset("1", t.TopicID, 0)
+  meta.CommitClientOffset(consumerID, t.TopicID, 0)
 
   return message, nil
 }
