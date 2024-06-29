@@ -17,6 +17,8 @@ type Partition struct {
 func (p *Partition) WriteMessage(message *Message) {
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
+
+  message.Offset = len(p.Messages)
 	p.Messages = append(p.Messages, message)
 	log.Println(len(p.Messages))
 }
@@ -35,4 +37,18 @@ func NewPartition(id int, topicName string) *Partition {
 		Messages:    []*Message{},
 		TopicName:   topicName,
 	}
+}
+
+func CopyPartition(partition *Partition) *Partition {
+  var messages []*Message
+
+  for _, k := range partition.Messages {
+    messages = append(messages, k)
+  }
+
+  return &Partition{
+    PartitionID: partition.PartitionID,
+    Messages: messages,
+    TopicName: partition.TopicName,
+  }
 }

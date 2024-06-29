@@ -12,9 +12,11 @@ const (
 )
 
 type Message struct {
-	Key       string
-	Value     interface{}
-	TopicID   string
-	Timestamp time.Time
-	Type      MessageType
+	Key         string
+	Value       string
+	TopicID     string
+	Timestamp   time.Time
+	Type        MessageType
+	Offset      int
+	PartitionID int
 }
