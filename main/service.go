@@ -17,6 +17,22 @@ type Service struct {
 func (s *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	mux := http.NewServeMux()
 
+	mux.HandleFunc("/topic/get/{topicName}", func(w http.ResponseWriter, r *http.Request) {
+    topicName := r.PathValue("topicName")
+    if s.fsm.meta.IsTopicAvailable(topicName) {
+      byteStream, err := json.Marshal(s.fsm.topics[topicName])
+      if err != nil {
+        w.WriteHeader(500)
+        w.Write([]byte(err.Error()))
+      }
+
+      w.Write([]byte(byteStream))
+    } else {
+      w.WriteHeader(404)
+      w.Write([]byte("The topic does not exist"))
+    }
+	})
+
 	mux.HandleFunc("/topic/post", func(w http.ResponseWriter, r *http.Request) {
 		t := struct {
 			TopicName         string
@@ -29,7 +45,13 @@ func (s *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		s.fsm.AddTopic(t.TopicName, t.ReplicationFactor)
+    if err := s.fsm.AddTopic(t.TopicName, t.ReplicationFactor); err != nil {
+      w.WriteHeader(500)
+      w.Write([]byte(err.Error()))
+      return
+    }
+
+    w.WriteHeader(201)
 	})
 
 	mux.HandleFunc("/message/get/{topicName}/{consumerID}", func(w http.ResponseWriter, r *http.Request) {
@@ -144,6 +166,8 @@ func NewService(nodeId, serviceAddr, raftAddr string, bootstrap bool) *Service {
 		if err := fsm.AddMetaTopic(); err != nil {
 			log.Fatal("Unable to add Meta topic ", err)
 		}
+
+    log.Println("========= Ready to add nodes to the cluster ==========")
 	}
 
 	return &Service{
