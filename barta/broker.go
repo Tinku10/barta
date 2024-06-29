@@ -8,6 +8,6 @@ const (
 	CreateMessage
 	MetaAddRaftNode
 	MetaMarkTopicAvailability
-  MetaAddReplicaSet
-  MetaCommitOffset
+	MetaAddReplicaSet
+	MetaCommitOffset
 )

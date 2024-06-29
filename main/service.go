@@ -18,19 +18,19 @@ func (s *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/topic/get/{topicName}", func(w http.ResponseWriter, r *http.Request) {
-    topicName := r.PathValue("topicName")
-    if s.fsm.meta.IsTopicAvailable(topicName) {
-      byteStream, err := json.Marshal(s.fsm.topics[topicName])
-      if err != nil {
-        w.WriteHeader(500)
-        w.Write([]byte(err.Error()))
-      }
+		topicName := r.PathValue("topicName")
+		if s.fsm.meta.IsTopicAvailable(topicName) {
+			byteStream, err := json.Marshal(s.fsm.topics[topicName])
+			if err != nil {
+				w.WriteHeader(500)
+				w.Write([]byte(err.Error()))
+			}
 
-      w.Write([]byte(byteStream))
-    } else {
-      w.WriteHeader(404)
-      w.Write([]byte("The topic does not exist"))
-    }
+			w.Write([]byte(byteStream))
+		} else {
+			w.WriteHeader(404)
+			w.Write([]byte("The topic does not exist"))
+		}
 	})
 
 	mux.HandleFunc("/topic/post", func(w http.ResponseWriter, r *http.Request) {
@@ -45,18 +45,18 @@ func (s *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-    if err := s.fsm.AddTopic(t.TopicName, t.ReplicationFactor); err != nil {
-      w.WriteHeader(500)
-      w.Write([]byte(err.Error()))
-      return
-    }
+		if err := s.fsm.AddTopic(t.TopicName, t.ReplicationFactor); err != nil {
+			w.WriteHeader(500)
+			w.Write([]byte(err.Error()))
+			return
+		}
 
-    w.WriteHeader(201)
+		w.WriteHeader(201)
 	})
 
 	mux.HandleFunc("/message/get/{topicName}/{consumerID}", func(w http.ResponseWriter, r *http.Request) {
 		topicName := r.PathValue("topicName")
-    consumerID := r.PathValue("consumerID")
+		consumerID := r.PathValue("consumerID")
 		message, err := s.fsm.GetMessage(topicName, consumerID)
 		if err != nil {
 			w.WriteHeader(500)
@@ -167,7 +167,7 @@ func NewService(nodeId, serviceAddr, raftAddr string, bootstrap bool) *Service {
 			log.Fatal("Unable to add Meta topic ", err)
 		}
 
-    log.Println("========= Ready to add nodes to the cluster ==========")
+		log.Println("========= Ready to add nodes to the cluster ==========")
 	}
 
 	return &Service{

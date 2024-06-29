@@ -38,17 +38,17 @@ func NewTopic(topicName string, replicationFactor int) *Topic {
 }
 
 func CopyTopic(topic *Topic) *Topic {
-  var partitions [PartitionsPerTopic]*Partition
+	var partitions [PartitionsPerTopic]*Partition
 
-  for i, v := range topic.Partitions {
-    partitions[i] = CopyPartition(v)
-  }
+	for i, v := range topic.Partitions {
+		partitions[i] = CopyPartition(v)
+	}
 
-  return &Topic {
-    TopicID: topic.TopicID,
-    Partitions: partitions,
-    ReplicationFactor: topic.ReplicationFactor,
-  }
+	return &Topic{
+		TopicID:           topic.TopicID,
+		Partitions:        partitions,
+		ReplicationFactor: topic.ReplicationFactor,
+	}
 }
 
 func (t *Topic) PutMessage(meta *MetaTopic, m *Message) {
@@ -88,33 +88,33 @@ func NewMetaTopic() *MetaTopic {
 }
 
 func CopyMetaTopic(topic *MetaTopic) *MetaTopic {
-  offsets := make(map[string]int)
-  availableTopics := make(map[string]bool)
-  replicaSet := make(map[string][]string)
+	offsets := make(map[string]int)
+	availableTopics := make(map[string]bool)
+	replicaSet := make(map[string][]string)
 
-  for k, v := range topic.Offsets {
-    offsets[k] = v
-  }
+	for k, v := range topic.Offsets {
+		offsets[k] = v
+	}
 
-  for k, v := range topic.AvailableTopics {
-    availableTopics[k] = v
-  }
+	for k, v := range topic.AvailableTopics {
+		availableTopics[k] = v
+	}
 
-  for k, v := range topic.ReplicaSet {
-    var replicas []string
-    for _, r := range v {
-      replicas = append(replicas, r)
-    }
+	for k, v := range topic.ReplicaSet {
+		var replicas []string
+		for _, r := range v {
+			replicas = append(replicas, r)
+		}
 
-    replicaSet[k] = replicas
-  }
+		replicaSet[k] = replicas
+	}
 
-  return &MetaTopic {
-    TopicID: topic.TopicID,
-    Offsets: offsets,
-    AvailableTopics: availableTopics,
-    ReplicaSet: replicaSet,
-  }
+	return &MetaTopic{
+		TopicID:         topic.TopicID,
+		Offsets:         offsets,
+		AvailableTopics: availableTopics,
+		ReplicaSet:      replicaSet,
+	}
 }
 
 func (t *MetaTopic) GenerateClientOffsetKey(clientID, topicID string, partitionID int) string {
@@ -135,8 +135,8 @@ func (t *MetaTopic) GetClientOffset(clientID, topicName string, partitionID int)
 }
 
 func (t *MetaTopic) CommitClientOffset(clientID, topicName string, partitionID int, offset int) {
-  t.mutex.Lock()
-  defer t.mutex.Unlock()
+	t.mutex.Lock()
+	defer t.mutex.Unlock()
 
 	key := t.GenerateClientOffsetKey(clientID, topicName, partitionID)
 	t.Offsets[key] = offset + 1
@@ -164,5 +164,5 @@ func (t *MetaTopic) MarkTopicAvailable(topicID string) {
 
 func (t *MetaTopic) IsTopicAvailable(topicID string) bool {
 	_, ok := t.AvailableTopics[topicID]
-  return ok
+	return ok
 }

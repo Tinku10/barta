@@ -116,16 +116,6 @@ func (s *FSM) Apply(raftLog *raft.Log) interface{} {
 			log.Println("Topic does not exist")
 			return errors.New("Topic does not exist")
 		}
-
-		// _, ok = topic.ReplicaSet[s.nodeID]
-
-		// // Topic containing metadata is always replicated
-		// if !ok && topic.TopicID != "__meta__" {
-		// 	log.Printf("Skipping replication of %v in node %s", l, s.nodeID)
-		// 	return nil
-		// }
-		log.Printf("Replicating message in node %s", s.nodeID)
-
 		topic.PutMessage(s.meta, l.Message)
 	case barta.MetaAddRaftNode:
 		s.meta.PutRaftNode(l.RaftNode)
@@ -139,7 +129,7 @@ func (s *FSM) Apply(raftLog *raft.Log) interface{} {
 		return errors.New("Not a valid command")
 	}
 
-	log.Println("== Applied successfully ", l)
+	log.Println("== Applied successfully")
 
 	return nil
 }
@@ -226,7 +216,7 @@ func (f *FSM) GetMessage(topicName string, consumerID string) (*barta.Message, e
 	})
 
 	if future := f.raft.Apply(byteStream, 10*time.Second); future.Error() != nil {
-    log.Print(future.Error())
+		log.Print(future.Error())
 		return &barta.Message{}, future.Error()
 	}
 

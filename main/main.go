@@ -17,7 +17,7 @@ func main() {
 
 	flag.Parse()
 
-  bootstrap := *joinServiceAddr == ""
+	bootstrap := *joinServiceAddr == ""
 	service := NewService(*nodeId, *serviceAddr, *raftAddr, bootstrap)
 
 	// Handle join request
